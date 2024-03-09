@@ -4,22 +4,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const dateConverter = require('../utils/dateConverter');
-
-let errors = {
-    username : "",
-    email : "",
-    password : "",
-    token: "",
-};
-
-const clearErrors = () => {
-    errors = {
-        username : "",
-        email : "",
-        password : "",
-        token: "",
-    };
-};
+const sendEmail = require('../utils/sendEmail');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -34,16 +19,12 @@ const signup = async (req, res) => {
     const usernameAlreadyExists = await User.findOne({ username });
     const emailAlreadyExists = await User.findOne({ email });
 
-    clearErrors();
-
     if(usernameAlreadyExists){
-        errors.username = "Username Already Exists!";
-        return res.status(401).json({ errors });
+        return res.status(401).json({ error: "Username Already Exists!" });
     }
 
     if(emailAlreadyExists){
-        errors.email = "Email Already Exists!";
-        return res.status(401).json({ errors });
+        return res.status(401).json({ error: "Email Already Exists!" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -80,12 +61,12 @@ const signup = async (req, res) => {
     console.log('Email Sent');
 
     res.status(200).json({ 
-        "message" : "Successfully Registered"
+        "message" : "Successfully Registered. Please check your email for account verification"
     });
 
 };
 
-const emailVerification = async(req, res) => {
+const emailVerification = async (req, res) => {
 
     const { token } = req.query;
 
@@ -96,11 +77,8 @@ const emailVerification = async(req, res) => {
         emailVerificationExpire: { $gt: Date.now() }
     });
 
-    clearErrors();
-
     if(!user){
-        errors.token = 'Invalid Verification Token';
-        return res.status(404).json({ errors });
+        return res.status(404).json({ error: 'Invalid token' });
     }
 
     user.onboarded = true;
@@ -125,23 +103,20 @@ const emailVerification = async(req, res) => {
     console.log('Email Sent');
 
     res.status(200).json({ 
-        "message" : "Successfully Registered"
+        "message" : "Email verified successfully"
     });
 
 };
 
-const signin = async(req, res) => {
+const signin = async (req, res) => {
 
     const { usernameOrEmail, password } = req.body;
-
-    clearErrors();
 
     const usernameExists = await User.findOne({ username : usernameOrEmail });
     const emailExists = await User.findOne({ email : usernameOrEmail });
 
     if(!usernameExists && !emailExists){
-        errors.username = "Username or Email not found!";
-        return res.status(404).json({ errors });
+        return res.status(404).json({ error: "Username or Email not found!" });
     }
 
     let user;
@@ -150,24 +125,21 @@ const signin = async(req, res) => {
     if(usernameExists){
         user = usernameExists;
         if(!usernameExists.onboarded){
-            errors.username = 'Please Verify your Email first';
-            return res.status(401).json({ errors });
+            return res.status(401).json({ error: 'Please Verify your Email first' });
         }
         hashPassword = usernameExists.password;
     }
     if(emailExists){
         user = emailExists;
         if(!emailExists.onboarded){
-            errors.username = 'Please Verify your Email first';
-            return res.status(401).json({ errors });
+            return res.status(401).json({ error: 'Please Verify your Email first' });
         }
         hashPassword = emailExists.password;
     }
 
     const auth = await bcrypt.compare(password, hashPassword);
     if(!auth){
-        errors.password = "Incorrect Password!";
-        return res.status(401).json({ errors });
+        return res.status(401).json({ error: "Incorrect Password!" });
     }
 
     const token = generateToken(user._id);
@@ -187,7 +159,11 @@ const signin = async(req, res) => {
         html: message
     });
 
-    res.status(200).json({ token, user });
+    res.status(200).json({ 
+        message: "Signedin successful",
+        token, 
+        user 
+    });
     
 };
 
@@ -197,11 +173,8 @@ const forgotPassword = async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    clearErrors();
-
     if(!user){
-        errors.email = 'Email not found';
-        return res.status(404).json({ errors });
+        return res.status(404).json({ error: 'Email not found' });
     }
 
     const resetPasswordToken = crypto.randomBytes(20).toString('hex');
@@ -244,11 +217,8 @@ const resetPassword = async (req, res) => {
         resetPasswordExpire: { $gt: Date.now() }
     });
 
-    clearErrors();
-
     if(!user){
-        errors.token = 'Invalid Token';
-        return res.status(401).json({ errors });
+        return res.status(401).json({ error: 'Invalid token' });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -266,9 +236,30 @@ const resetPassword = async (req, res) => {
 
 };
 
-const updateUser = async(req, res) => {
+const updateUser = async (req, res) => {
 
+    const { username, recipeId } = req.body;
 
+    const user = await User.findOne({ _id: req.user._id });
+
+    if(username && (username !== user.username)){
+        const usernameExists = await User.findOne({ username });
+        if(usernameExists){
+            return res.status(401).json({ error: 'This username already exists' });
+        } 
+        user.username = username;
+    }
+
+    if(recipeId && !user.bookmarks.includes(recipeId)){
+        user.bookmarks.push(recipeId);
+    }
+
+    await user.save();
+
+    res.status(201).json({
+        message: 'Successfully updated',
+        user
+    });
     
 };
 
