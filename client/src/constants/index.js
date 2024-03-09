@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 
-export const SERVER_DOMAIN = 'http://localhost:4000';
+export const SERVER_DOMAIN = 'https://mittarv-assignment-1.onrender.com';
 
 export const notify = (message, type) => {
     

@@ -87,7 +87,7 @@ const emailVerification = async (req, res) => {
 
     await user.save();
 
-    const recipesUrl = `${process.env.CLIENT_DOMAIN}/recipes`;
+    const recipesUrl = `${process.env.CLIENT_DOMAIN}`;
 
     const message = `
         <h2> Welcome to Recipevibe! </h2>
