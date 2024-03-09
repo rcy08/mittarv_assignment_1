@@ -17,7 +17,7 @@ const Recipe = () => {
     const [recipe, setRecipe] = useState('');
     const [tags, setTags] = useState('');
 
-    // console.log('recipe:', recipe);
+    console.log('recipe:', recipe);
 
     useEffect(() => {
 
@@ -35,14 +35,6 @@ const Recipe = () => {
               console.log(result);
               setRecipe(JSON.parse(result));
 
-              let tagss = '';
-              recipe.tags.forEach((tag, index) => (
-                tagss += tag,
-                tagss += (index !== recipe.tags.length - 1 ? ',  ' : '') 
-              ))
-
-              setTags(tagss);
-
             } catch (error) {
               console.error(error);
             }
@@ -53,11 +45,21 @@ const Recipe = () => {
           getRecipe();
         } 
 
-        if(user){
-          setUserDetails(user.user);
-        }
+    }, []);
 
-    }, [user]);
+    setTimeout(() => {
+
+      if(recipe){
+        let tagss = '';
+        recipe.tags.forEach((tag, index) => (
+          tagss += tag,
+          tagss += (index !== recipe.tags.length - 1 ? ',  ' : '') 
+        ))  
+        setTags(tagss);
+      }
+      if(user) setUserDetails(user.user);
+      
+    }, 3000);
 
     const handleBookmark = async (e) => {
       e.preventDefault();
