@@ -120,8 +120,8 @@ const Signin = () => {
             <Button
                 variant={mode === 'signin' ? 'contained' : 'outlined'}
                 onClick={() => {
-                    SetMode('signin');
                     setFormData({});
+                    SetMode('signin');
                 }}
                 style={{
                     textTransform: 'none',
@@ -135,8 +135,8 @@ const Signin = () => {
             <Button
                 variant={mode === 'signup' ? 'contained' : 'outlined'}
                 onClick={() => {
-                    SetMode('signup');
                     setFormData({});
+                    SetMode('signup');
                 }}
                 style={{
                     textTransform: 'none',

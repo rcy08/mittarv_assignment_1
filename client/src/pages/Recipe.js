@@ -17,7 +17,7 @@ const Recipe = () => {
     const [recipe, setRecipe] = useState('');
     const [tags, setTags] = useState('');
 
-    console.log('recipe:', recipe);
+    // console.log('recipe:', recipe);
 
     useEffect(() => {
 

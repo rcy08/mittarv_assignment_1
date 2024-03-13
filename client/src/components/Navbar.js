@@ -173,8 +173,12 @@ const Navbar = () => {
                         paddingRight: '16px'
                     }}
                     onClick={() => {
-                        searchParams.set('redirect_uri', currentUrl);
-                        window.location.href = `/auth/signin?${searchParams.toString()}${currentUrl.hash}`;
+                        const newUrl = new URL(`${currentUrl.origin}/${currentUrl.pathname}`);
+                        const newSearchParams = new URLSearchParams(newUrl.search);
+    
+                        newSearchParams.set('redirect_uri', currentUrl);
+                        
+                        window.location.href = `/auth/signin?${newSearchParams.toString()}${newUrl.hash}`;
                     }}
                     variant='contained'
                 >
