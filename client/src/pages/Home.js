@@ -28,16 +28,26 @@ const Home = () => {
   const [search, setSearch] = useState(searchParams.get('q') || '');
   const [recipes, setRecipes] = useState(JSON.parse(recipeString));
 
-  let url = `https://low-carb-recipes.p.rapidapi.com/search?limit=20`;
+  let url = new URL(`https://low-carb-recipes.p.rapidapi.com/search`);
+  const urlSearchParams = new URLSearchParams(url.search);
 
   const getRecipes = async () => {
 
-    if(searchParams.get('q')){
-      url += `name=${searchParams.get('q')}`;
-    }
+    if(searchParams.get('q')) urlSearchParams.set('name', searchParams.get('q'));
+
+    const queryParameters = ['tags', 'includeIngredients', 'excludeIngredients', 'maxPrepareTime', 'maxCookTime', 'maxCalories', 'maxNetCarbs', 'maxAddedSugar'];
+
+    queryParameters.forEach((p) => {
+      if(searchParams.get(p)){
+        urlSearchParams.set(p, searchParams.get(p));
+      }
+    });
+
+    urlSearchParams.set('limit', 20);
+    url.search = urlSearchParams.toString();
 
     // const url = 'https://low-carb-recipes.p.rapidapi.com/search?name=cake&tags=keto%3Bdairy-free&includeIngredients=egg%3Bbutter&excludeIngredients=cinnamon&maxPrepareTime=10&maxCookTime=20&maxCalories=500&maxNetCarbs=5&maxSugar=3&maxAddedSugar=0&limit=10';
-
+    
     const options = {
       method: 'GET',
       headers: {
@@ -47,7 +57,7 @@ const Home = () => {
     };
 
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url.toString(), options);
       const result = await response.text();
       console.log(JSON.parse(result));
       setRecipes(JSON.parse(result));
@@ -359,7 +369,7 @@ const Home = () => {
         </Button>
 
         <Button
-          variant='outlined'
+          variant='contained'
           onClick={() => {
             let url = `/home`;
             if(searchParams.get('q')) url += `?q=${searchParams.get('q')}`;
@@ -439,7 +449,7 @@ const Home = () => {
             :
 
             recipes.slice(start, end).map((recipe, index) => (
-              <Link key={index} to={`/recipe/${recipe.id}`} className={`flex flex-col gap-4 bg-blue-200 text-black mx-8 sm:mx-0 sm:w-[325px] p-6 rounded`}>
+              <Link key={index} to={`/recipe/${recipe.id}`} target='_blank' className={`flex flex-col gap-4 bg-blue-200 text-black mx-8 sm:mx-0 sm:w-[325px] p-6 rounded`}>
                 <img 
                   src={recipe.image}
                   alt='RecipeImage'
@@ -447,6 +457,7 @@ const Home = () => {
                   height={300}
                 />
                 <h1 className='text-md font-bold text-center'> {recipe.name} </h1>
+                
               </Link>
             ))
 
@@ -460,7 +471,8 @@ const Home = () => {
             color="primary" 
             page={Number(searchParams.get('page')) || 1}
             onChange={(e, page) => {
-              window.location.href = `/home?page=${page}`;
+              searchParams.set('page', page);
+              window.location.href = `/home?${searchParams.toString()}${currentUrl.hash}`;
             }}
             showFirstButton
             showLastButton

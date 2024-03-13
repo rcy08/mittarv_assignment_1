@@ -154,11 +154,11 @@ const Recipe = () => {
           </div>
 
           <div className='text-lg mb-4 flex flex-col gap-2'>
-            <div className='font-medium'> Prepare time </div> {recipe.prepareTime}
+            <div className='font-medium'> Prepare time (minutes)</div> {recipe.prepareTime}
           </div>
 
           <div className='text-lg mb-4 flex flex-col gap-2'>
-            <div className='font-medium'> Cook time </div> {recipe.cookTime}
+            <div className='font-medium'> Cook time (minutes) </div> {recipe.cookTime}
           </div>
 
           <div className='flex flex-col gap-2 mb-8'>

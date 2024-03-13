@@ -4,13 +4,16 @@ import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthContextProvider } from './context/AuthContext';
+import { MantineProvider } from '@mantine/core';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthContextProvider>
       <BrowserRouter>
-        <App />
+        <MantineProvider>
+          <App />  
+        </MantineProvider>
       </BrowserRouter>  
     </AuthContextProvider>
   </React.StrictMode>

@@ -14,6 +14,9 @@ import { useAuthContext } from './hooks/useAuthContext';
 import EmailVerification from './pages/EmailVerification';
 import ResetPassword from './pages/ResetPassword';
 
+import '@mantine/core/styles.css';
+import MyRecipe from './pages/MyRecipe';
+
 function App() {
 
   const { signedin } = useAuthContext();
@@ -65,6 +68,10 @@ function App() {
         <Route
           path='/recipe/:id'
           element={<Recipe />}
+        />
+        <Route
+          path='/recipes/my'
+          element={ <MyRecipe /> }
         />
         <Route
           path='*'

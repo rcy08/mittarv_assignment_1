@@ -44,7 +44,8 @@ const Navbar = () => {
     const handleLogout = () => {
         dispatch({ type: 'SIGNOUT' });
         localStorage.removeItem('user');
-        window.location.href = '/auth/signin';
+        searchParams.set('redirect_uri', currentUrl);
+        window.location.href = `/auth/signin?${searchParams.toString()}${currentUrl.hash}`;
     }
 
   return (
@@ -125,7 +126,10 @@ const Navbar = () => {
                             <Avatar /> Profile
                         </MenuItem>
 
-                        <MenuItem onClick={handleClose}>
+                        <MenuItem onClick={() => {
+                            handleClose();
+                            window.location.href = '/recipes/my';
+                        }}>
                             <Avatar /> My recipes
                         </MenuItem>
 

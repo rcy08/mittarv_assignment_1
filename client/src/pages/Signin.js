@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import Button from '@mui/material/Button';
+import { Button as MantineButton } from '@mantine/core';
+import { Button } from '@mui/material';
 import TextField from '@mui/material/TextField';
 import { SERVER_DOMAIN, notify } from '../constants';
 import { Link } from 'react-router-dom';
@@ -16,6 +17,8 @@ const Signin = () => {
     const searchParams = new URLSearchParams(currentUrl.search);
 
     const { signedin, dispatch } = useAuthContext();
+    const [signinButtonState, setSigninButtonState] = useState('click');
+    const [signupButtonState, setSignupButtonState] = useState('click');
 
     const handleSignin = async (e) => {
 
@@ -25,6 +28,8 @@ const Signin = () => {
             notify('Please fill all required fields', 'error');
         }
         else{
+
+            setSigninButtonState('loading');
 
             const response = await fetch(`${SERVER_DOMAIN}/auth/signin`, {
                 method: 'POST',
@@ -38,6 +43,8 @@ const Signin = () => {
             });
 
             const data = await response.json();
+
+            setSigninButtonState('click');
 
             if(data.error){
                 notify(data.error, 'error');
@@ -83,6 +90,8 @@ const Signin = () => {
         }
         else{
 
+            setSignupButtonState('loading');
+
             const response = await fetch(`${SERVER_DOMAIN}/auth/signup`, {
                 method: 'POST',
                 headers: {
@@ -96,6 +105,8 @@ const Signin = () => {
             });
 
             const data = await response.json();
+
+            setSignupButtonState('click');
 
             if(data.error){
                 notify(data.error, 'error');
@@ -192,18 +203,17 @@ const Signin = () => {
                             Forgot password?
                         </Link>
 
-                        <Button 
-                            variant="contained" 
-                            size="medium" 
+                        <MantineButton 
                             style={{
                                 textTransform: 'none',
                                 fontSize: '15px',
                                 marginTop: '15px'
                             }}
                             onClick={handleSignin}
+                            loading={signinButtonState === 'click' ? false : true}
                         > 
                             Signin
-                        </Button>
+                        </MantineButton>
 
                     </form>
 
@@ -275,18 +285,17 @@ const Signin = () => {
                         onChange={(e) => setFormData({ ...formData, confirmpassword: e.target.value })}
                     />
 
-                    <Button 
-                        variant="contained" 
-                        size="medium" 
+                    <MantineButton 
                         style={{
                             textTransform: 'none',
                             fontSize: '15px',
                             marginTop: '15px'
                         }}
                         onClick={handleSignup}
+                        loading={signupButtonState === 'click' ? false : true}
                     > 
                         Signup
-                    </Button>
+                    </MantineButton>
 
                     </form>
                 
