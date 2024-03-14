@@ -4,17 +4,20 @@ import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthContextProvider } from './context/AuthContext';
+import { LoadingContextProvider } from './context/LoadingContext';
 import { MantineProvider } from '@mantine/core';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthContextProvider>
-      <BrowserRouter>
-        <MantineProvider>
-          <App />  
-        </MantineProvider>
-      </BrowserRouter>  
+      <LoadingContextProvider>
+        <BrowserRouter>
+          <MantineProvider>
+            <App />  
+          </MantineProvider>
+        </BrowserRouter>    
+      </LoadingContextProvider>
     </AuthContextProvider>
   </React.StrictMode>
 );

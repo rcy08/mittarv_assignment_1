@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from "./components/Navbar";
 import Signin from './pages/Signin';
 import Home from './pages/Home';
+import Loader from './Loader';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,6 +12,7 @@ import NotFound from './pages/NotFound';
 import ForgotPassword from './pages/ForgotPassword';
 
 import { useAuthContext } from './hooks/useAuthContext';
+import { useLoadingContext } from './hooks/useLoadingContext';
 import EmailVerification from './pages/EmailVerification';
 import ResetPassword from './pages/ResetPassword';
 
@@ -19,10 +21,28 @@ import MyRecipe from './pages/MyRecipe';
 
 function App() {
 
-  const { signedin } = useAuthContext();
+  const { signedin, dispatch } = useAuthContext();
+  const { loadingState, loadingDispatch } = useLoadingContext();
+
+  const currentUrl = new URL(window.location.href);
+  const searchParams = new URLSearchParams(currentUrl.search);
+
+  setTimeout(() => {
+    if(signedin){
+      localStorage.removeItem('user');
+      dispatch({ type: 'SIGNOUT' });
+      searchParams.set('redirect_uri', currentUrl);
+      for (const key of searchParams.keys()) {
+        if(key !== 'redirect_uri') searchParams.delete(key);
+      }
+      window.location.href = `/auth/signin?${searchParams.toString()}${currentUrl.hash}`;
+    }
+  }, 24*60*60*1000);
 
   return (
     <div className="App">
+
+      { loadingState && <Loader /> }
       
       <Navbar />
 

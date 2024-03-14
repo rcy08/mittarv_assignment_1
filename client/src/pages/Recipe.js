@@ -27,7 +27,7 @@ const Recipe = () => {
               const response = await fetch(`https://low-carb-recipes.p.rapidapi.com/recipes/${id}`, {
                 method: 'GET',
                 headers: {
-                  'X-RapidAPI-Key': '03004c32c1msh9f7d3f2279e45e8p160c4ajsn8082e1e96616',
+                  'X-RapidAPI-Key': 'a3f06cace0msh1f4f58ccd59d209p14e70fjsn93c39443cf95',
                   'X-RapidAPI-Host': 'low-carb-recipes.p.rapidapi.com'
                 }
               });

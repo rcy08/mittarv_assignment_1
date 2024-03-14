@@ -18,6 +18,8 @@ import ListItemText from '@mui/material/ListItemText';
 import Select from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
 
+import { useLoadingContext } from '../hooks/useLoadingContext';
+
 import { recipeString, recipeTags, MenuProps, includeIngredients, excludeIngredients, maxPrepareTimeValues, maxCookTimeValues,maxCaloriesValues, maxNetCarbsValues } from '../constants';
 
 const Home = () => {
@@ -26,7 +28,9 @@ const Home = () => {
   const [searchParams, setSearchParams] = useState(new URLSearchParams(currentUrl.search));
 
   const [search, setSearch] = useState(searchParams.get('q') || '');
-  const [recipes, setRecipes] = useState(JSON.parse(recipeString));
+  const [recipes, setRecipes] = useState('');
+
+  const { loadingState, loadingDispatch } = useLoadingContext();
 
   let url = new URL(`https://low-carb-recipes.p.rapidapi.com/search`);
   const urlSearchParams = new URLSearchParams(url.search);
@@ -51,7 +55,7 @@ const Home = () => {
     const options = {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Key': '03004c32c1msh9f7d3f2279e45e8p160c4ajsn8082e1e96616',
+        'X-RapidAPI-Key': 'a3f06cace0msh1f4f58ccd59d209p14e70fjsn93c39443cf95',
         'X-RapidAPI-Host': 'low-carb-recipes.p.rapidapi.com'
       }
     };
@@ -61,6 +65,9 @@ const Home = () => {
       const result = await response.text();
       console.log(JSON.parse(result));
       setRecipes(JSON.parse(result));
+
+      loadingDispatch({ type: 'RESET' });
+      
     } catch (error) {
       console.error(error);
     }  
@@ -69,7 +76,9 @@ const Home = () => {
 
   useEffect(() => {
 
-    // getRecipes();
+    loadingDispatch({ type: 'LOADING' });
+
+    getRecipes();
 
   }, []);
 
@@ -440,6 +449,15 @@ const Home = () => {
         <div className='grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16'>
 
           {
+
+            loadingState?
+            
+              <div className='text-md font-bold text-center col-span-4'>
+                Loading...
+              </div>
+
+            :
+
             !recipes || recipes.length === 0 ?
 
               <div className='text-md font-bold text-center col-span-4'>
